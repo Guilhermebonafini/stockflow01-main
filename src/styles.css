@@ -1,0 +1,82 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Sistema de design do StockFlow: todas as cores ficam aqui. */
+
+@theme inline {
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "DM Sans", sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: oklch(82.172% 0.00817 106.76);
+  --foreground: oklch(0.22 0.03 180);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.03 180);
+  --primary: oklch(0.42 0.08 175);
+  --primary-foreground: oklch(0.98 0.01 95);
+  --secondary: oklch(0.93 0.02 150);
+  --secondary-foreground: oklch(0.3 0.05 175);
+  --muted: oklch(0.95 0.01 95);
+  --muted-foreground: oklch(0.5 0.02 180);
+  --accent: oklch(77.875% 0.17259 66.559);
+  --accent-foreground: oklch(0.25 0.04 60);
+  --destructive: oklch(62.793% 0.25768 29.223);
+  --destructive-foreground: oklch(0.98 0 0);
+  --warning: oklch(73.325% 0.14573 71.299);
+  --border: oklch(0.9 0.015 120);
+  --input: oklch(0.88 0.015 120);
+  --ring: oklch(0.42 0.08 175);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+  }
+}
+
+@utility field {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-input);
+  background: var(--color-card);
+  padding: 0.6rem 0.8rem;
+  &:focus {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 1px;
+  }
+}
