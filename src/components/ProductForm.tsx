@@ -26,20 +26,20 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded-xl border bg-card p-4">
+    <form onSubmit={handleSubmit} className="space-y-3 p-5">
       <h2 className="text-lg font-semibold">{initial ? "Editar produto" : "Novo produto"}</h2>
-      <input className="field" placeholder="Nome" value={name} onChange={(e) => setName(e.target.value)} />
-      <input className="field" placeholder="Categoria" value={category} onChange={(e) => setCategory(e.target.value)} />
+      <input className="field" aria-label="Nome do produto" autoFocus placeholder="Nome" value={name} onChange={(e) => setName(e.target.value)} />
+      <input className="field" aria-label="Categoria" placeholder="Categoria" value={category} onChange={(e) => setCategory(e.target.value)} />
       <div className="grid grid-cols-2 gap-3">
-        <input className="field" type="number" step="0.01" placeholder="Preço (R$)" value={price} onChange={(e) => setPrice(e.target.value)} />
-        <input className="field" type="number" placeholder="Quantidade" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+        <input className="field" type="number" step="0.01" aria-label="Preço em reais" placeholder="Preço (R$)" value={price} onChange={(e) => setPrice(e.target.value)} />
+        <input className="field" type="number" aria-label="Quantidade" placeholder="Quantidade" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" className="rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground">
+        <button type="submit" className="min-h-10 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90">
           Salvar
         </button>
-        <button type="button" onClick={onCancel} className="rounded-md bg-muted px-4 py-2">
+        <button type="button" onClick={onCancel} className="min-h-10 rounded-lg bg-muted px-4 py-2 text-sm font-medium hover:bg-border">
           Cancelar
         </button>
       </div>

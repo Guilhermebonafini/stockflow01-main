@@ -7,6 +7,18 @@ export type Product = {
   quantity: number;
 };
 
+// Uma entrada ou saída de estoque. O formato é o mesmo já salvo no navegador.
+export type Movement = {
+  id: string;
+  productId: string;
+  productName: string;
+  type: "entrada" | "saida";
+  quantity: number;
+  note: string;
+  createdAt: string; // data/hora em formato ISO
+};
+
+// Abaixo (ou igual) a este valor o produto é considerado com estoque baixo.
 export const LOW_STOCK_LIMIT = 5;
 
 export const initialProducts: Product[] = [

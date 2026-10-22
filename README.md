@@ -47,3 +47,26 @@ Aplicação web para pequenos negócios acompanharem produtos e movimentações 
 - Não há login, equipe, sincronização em nuvem nem isolamento por empresa nesta versão.
 - Não use dados sensíveis ou dados comerciais reais importantes até integrar um banco de dados e autenticação seguros.
 - A próxima etapa recomendada é integrar Supabase com políticas de Row Level Security (RLS) e testar as permissões antes de disponibilizar para clientes.
+
+## Páginas
+
+| Rota | Página |
+| --- | --- |
+| `/` | Início: indicadores, estoque baixo e movimentações recentes |
+| `/produtos` | Cadastro, edição, busca e filtro por categoria |
+| `/movimentacoes` | Histórico e registro de entradas e saídas |
+| `/relatorios` | Posição do estoque, movimentações e estoque baixo, com filtros, gráficos e exportação CSV |
+| `/pdv` | Em desenvolvimento |
+| `/configuracoes` | Gerenciar os dados salvos no navegador |
+
+## Estrutura do código
+
+- `src/lib/stock-store.tsx`: dados (produtos e movimentações) compartilhados por todas as páginas. É o único lugar que fala com o `localStorage`; ao migrar para o banco online, a troca acontece aqui.
+- `src/lib/reports.ts`: filtros, cálculos e CSV dos relatórios. Para criar um relatório novo, adicione uma definição em `REPORTS`.
+- `src/components/AppShell.tsx`: menu lateral (notebook e tablet), barra superior e menu inferior (celular).
+
+## Testes
+
+```bash
+npm test
+```
