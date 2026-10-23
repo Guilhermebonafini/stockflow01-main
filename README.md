@@ -1,6 +1,6 @@
 # StockFlow — MVP de controle de estoque
 
-Aplicação web para pequenos negócios acompanharem produtos e movimentações de estoque. Esta versão é um MVP de aprendizado: os dados ficam no `localStorage` do navegador e não são sincronizados entre dispositivos ou usuários.
+Aplicação web para pequenos negócios acompanharem produtos e movimentações de estoque. Os produtos e as movimentações ficam salvos no Supabase, ligados à conta de cada usuário (com RLS), e aparecem em qualquer aparelho em que a pessoa entrar. Dados de versões antigas, que ficavam só no navegador, podem ser importados em Configurações.
 
 ## Funcionalidades
 
@@ -57,7 +57,7 @@ Aplicação web para pequenos negócios acompanharem produtos e movimentações 
 | `/movimentacoes` | Histórico e registro de entradas e saídas |
 | `/relatorios` | Posição do estoque, movimentações e estoque baixo, com filtros, gráficos e exportação CSV |
 | `/pdv` | Em desenvolvimento |
-| `/configuracoes` | Gerenciar os dados salvos no navegador |
+| `/configuracoes` | Dados da conta e importação dos dados antigos do navegador |
 
 ## Estrutura do código
 

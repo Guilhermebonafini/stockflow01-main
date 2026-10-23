@@ -14,11 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      movements: {
+        Row: {
+          created_at: string
+          id: string
+          legacy_id: string | null
+          note: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          legacy_id?: string | null
+          note?: string
+          product_id?: string | null
+          product_name: string
+          quantity: number
+          type: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          legacy_id?: string | null
+          note?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movements_product_owner_fk"
+            columns: ["product_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
           created_at: string
           id: string
+          legacy_id: string | null
+          min_quantity: number
           name: string
           price: number
           quantity: number
@@ -28,6 +74,8 @@ export type Database = {
           category: string
           created_at?: string
           id?: string
+          legacy_id?: string | null
+          min_quantity?: number
           name: string
           price: number
           quantity?: number
@@ -37,6 +85,8 @@ export type Database = {
           category?: string
           created_at?: string
           id?: string
+          legacy_id?: string | null
+          min_quantity?: number
           name?: string
           price?: number
           quantity?: number
@@ -49,7 +99,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      import_local_data: {
+        Args: { p_movements: Json; p_products: Json }
+        Returns: Json
+      }
+      register_movement: {
+        Args: {
+          p_note?: string
+          p_product_id: string
+          p_quantity: number
+          p_type: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          legacy_id: string | null
+          note: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          type: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "movements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never

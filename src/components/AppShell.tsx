@@ -66,7 +66,7 @@ function Sidebar() {
         ))}
       </nav>
       <p className="mt-auto rounded-lg bg-sidebar-hover/70 p-3 text-xs leading-relaxed text-sidebar-foreground">
-        Seus dados ficam salvos neste navegador.
+        Seus dados ficam salvos na sua conta.
       </p>
     </aside>
   );
@@ -109,7 +109,7 @@ function TopBar() {
         <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
             <p className="text-sm font-bold leading-tight">Meu estabelecimento</p>
-            <p className="text-xs text-muted-foreground">Dados salvos neste navegador</p>
+            <p className="text-xs text-muted-foreground">Dados salvos na sua conta</p>
           </div>
           <span
             className="grid size-9 place-items-center rounded-full bg-secondary text-primary"
@@ -124,7 +124,22 @@ function TopBar() {
 }
 
 function NoticeBar() {
-  const { notice, dismissNotice } = useStock();
+  const { notice, dismissNotice, loadError, reload } = useStock();
+  if (loadError)
+    return (
+      <div
+        role="alert"
+        className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+      >
+        <span>{loadError} Seus dados não foram apagados.</span>
+        <button
+          onClick={() => void reload()}
+          className="rounded-lg border border-destructive/40 px-3 py-1 font-semibold hover:bg-destructive/10"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
   if (!notice) return null;
   return (
     <div
