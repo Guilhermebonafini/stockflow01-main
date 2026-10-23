@@ -1,3 +1,7 @@
+import { useEffect, useState, type ReactNode } from "react";
+import { useRouterState, useNavigate } from "@tanstack/react-router";
+import { supabase } from "../integrations/supabase/client";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -8,7 +12,7 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -117,16 +121,79 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const navigate = useNavigate();
+
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
+
+  const isPublicRoute =
+    pathname === "/login" || pathname === "/cadastro";
+
+  useEffect(() => {
+    let active = true;
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!active) return;
+
+      setHasSession(!!session);
+      setSessionChecked(true);
+    });
+
+    supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (!active) return;
+
+        setHasSession(!error && !!data.session);
+        setSessionChecked(true);
+      })
+      .catch(() => {
+        if (!active) return;
+
+        setHasSession(false);
+        setSessionChecked(true);
+      });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!sessionChecked) return;
+
+    if (!hasSession && !isPublicRoute) {
+      void navigate({ to: "/login", replace: true });
+    } else if (hasSession && isPublicRoute) {
+      void navigate({ to: "/", replace: true });
+    }
+  }, [sessionChecked, hasSession, isPublicRoute, navigate]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <StockProvider>
-        <AppShell>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        {!isPublicRoute && (!sessionChecked || !hasSession) ? (
+          <main className="flex min-h-screen items-center justify-center bg-background">
+            <p className="text-sm text-muted-foreground">
+              Verificando autenticação...
+            </p>
+          </main>
+        ) : isPublicRoute ? (
           <Outlet />
-        </AppShell>
+        ) : (
+          <AppShell>
+            <Outlet />
+          </AppShell>
+        )}
       </StockProvider>
     </QueryClientProvider>
   );
