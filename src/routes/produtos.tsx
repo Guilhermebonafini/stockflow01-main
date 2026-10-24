@@ -135,7 +135,9 @@ function ProductsPage() {
                     `Excluir o produto “${p.name}”? O histórico de movimentações será mantido.`,
                   )
                 )
-                  deleteProduct(p);
+                  void deleteProduct(p).then((r) => {
+                    if (!r.ok) notify(r.error);
+                  });
               }}
             />
             <p className="mt-3 text-xs text-muted-foreground">
@@ -150,9 +152,10 @@ function ProductsPage() {
           <ProductForm
             key={editing?.id ?? "new"}
             initial={editing ?? undefined}
-            onSave={(data) => {
-              saveProduct(editing?.id ?? null, data);
-              closeForm();
+            onSave={async (data) => {
+              const result = await saveProduct(editing?.id ?? null, data);
+              if (result.ok) closeForm();
+              return result;
             }}
             onCancel={closeForm}
           />

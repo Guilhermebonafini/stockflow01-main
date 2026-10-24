@@ -1,0 +1,5 @@
+Backup da versão ANTERIOR à troca de localStorage por Supabase (Etapa 0).
+Cada arquivo .bak é a cópia exata do original, no mesmo caminho relativo.
+Para restaurar um arquivo: copie-o de volta e remova o sufixo .bak.
+Exemplo: cp backups/v1-localstorage/src/lib/stock-store.tsx.bak src/lib/stock-store.tsx
+(O Git também guarda essa versão no commit 257bc1b.)

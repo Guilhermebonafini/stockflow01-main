@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from "react";
 import type { Product } from "@/data/products";
+import type { ActionResult } from "@/lib/stock-store";
 
 // Formulário usado tanto para cadastrar quanto para editar.
 type Props = {
   initial?: Product | undefined;
-  onSave: (data: Omit<Product, "id">) => void;
+  onSave: (data: Omit<Product, "id">) => Promise<ActionResult>;
   onCancel: () => void;
 };
 
@@ -14,15 +15,20 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
   const [price, setPrice] = useState(String(initial?.price ?? ""));
   const [quantity, setQuantity] = useState(String(initial?.quantity ?? ""));
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const p = Number(price);
     const q = Number(quantity);
     if (!name.trim() || !category.trim()) return setError("Preencha nome e categoria.");
     if (isNaN(p) || p < 0) return setError("Preço inválido.");
     if (!Number.isInteger(q) || q < 0) return setError("Quantidade deve ser inteira e ≥ 0.");
-    onSave({ name: name.trim(), category: category.trim(), price: p, quantity: q });
+    setError("");
+    setBusy(true);
+    const result = await onSave({ name: name.trim(), category: category.trim(), price: p, quantity: q });
+    setBusy(false);
+    if (!result.ok) setError(result.error);
   }
 
   return (
@@ -36,8 +42,8 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" className="min-h-10 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90">
-          Salvar
+        <button type="submit" disabled={busy} className="min-h-10 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50">
+          {busy ? "Salvando..." : "Salvar"}
         </button>
         <button type="button" onClick={onCancel} className="min-h-10 rounded-lg bg-muted px-4 py-2 text-sm font-medium hover:bg-border">
           Cancelar

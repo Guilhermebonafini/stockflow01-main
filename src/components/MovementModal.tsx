@@ -7,16 +7,20 @@ import { useStock } from "@/lib/stock-store";
 export function MovementModal({ onClose }: { onClose: () => void }) {
   const { products, registerMovement } = useStock();
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-    const result = registerMovement({
+    setError("");
+    setBusy(true);
+    const result = await registerMovement({
       productId: String(form.get("productId") ?? ""),
       type: form.get("type") === "saida" ? "saida" : "entrada",
       quantity: Number(form.get("quantity")),
       note: String(form.get("note") ?? ""),
     });
+    setBusy(false);
     if (result.ok) onClose();
     else setError(result.error);
   }
@@ -86,8 +90,8 @@ export function MovementModal({ onClose }: { onClose: () => void }) {
           </p>
         )}
         <div className="flex gap-2">
-          <button type="submit" className={btnPrimary}>
-            Registrar
+          <button type="submit" disabled={busy} className={btnPrimary}>
+            {busy ? "Salvando..." : "Registrar"}
           </button>
           <button type="button" onClick={onClose} className={btnSecondary}>
             Cancelar

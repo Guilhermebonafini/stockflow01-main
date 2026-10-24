@@ -1,0 +1,2 @@
+Backup do AppShell.tsx ANTES de adicionar o botao Sair.
+Restaurar: cp backups/v2-pre-logout/src/components/AppShell.tsx.bak src/components/AppShell.tsx

@@ -4,6 +4,7 @@ import {
   ArrowLeftRight,
   BarChart3,
   Home,
+  LogOut,
   MoreHorizontal,
   Package,
   ScanBarcode,
@@ -13,6 +14,8 @@ import {
   X,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { supabase } from "@/integrations/supabase/client";
+import { signOutUser } from "@/lib/auth";
 import { useStock } from "@/lib/stock-store";
 
 // Estrutura fixa do sistema: menu lateral (notebook/tablet), barra superior
@@ -45,7 +48,25 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 }
 
+// Encerra a sessão e volta para o login. Os dados da conta anterior somem da tela
+// porque o StockProvider limpa tudo quando a sessão termina.
+function useSignOut() {
+  const navigate = useNavigate();
+  const { notify } = useStock();
+  const [busy, setBusy] = useState(false);
+
+  async function signOut() {
+    setBusy(true);
+    const result = await signOutUser(supabase.auth);
+    setBusy(false);
+    if (!result.ok) return notify(result.error);
+    void navigate({ to: "/login", replace: true });
+  }
+  return { signOut, busy };
+}
+
 function Sidebar() {
+  const { signOut, busy } = useSignOut();
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col bg-sidebar p-4 md:flex lg:w-60">
       <Link to="/" className="mb-8 mt-1 px-1" aria-label="StockFlow — ir para o início">
@@ -66,8 +87,16 @@ function Sidebar() {
         ))}
       </nav>
       <p className="mt-auto rounded-lg bg-sidebar-hover/70 p-3 text-xs leading-relaxed text-sidebar-foreground">
-        Seus dados ficam salvos neste navegador.
+        Seus dados ficam salvos na sua conta.
       </p>
+      <button
+        onClick={() => void signOut()}
+        disabled={busy}
+        className="mt-3 flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-sidebar-foreground transition-colors hover:bg-sidebar-hover hover:text-white disabled:opacity-60"
+      >
+        <LogOut size={18} aria-hidden="true" />
+        {busy ? "Saindo..." : "Sair"}
+      </button>
     </aside>
   );
 }
@@ -109,7 +138,7 @@ function TopBar() {
         <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
             <p className="text-sm font-bold leading-tight">Meu estabelecimento</p>
-            <p className="text-xs text-muted-foreground">Dados salvos neste navegador</p>
+            <p className="text-xs text-muted-foreground">Dados salvos na sua conta</p>
           </div>
           <span
             className="grid size-9 place-items-center rounded-full bg-secondary text-primary"
@@ -124,7 +153,22 @@ function TopBar() {
 }
 
 function NoticeBar() {
-  const { notice, dismissNotice } = useStock();
+  const { notice, dismissNotice, loadError, reload } = useStock();
+  if (loadError)
+    return (
+      <div
+        role="alert"
+        className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+      >
+        <span>{loadError} Seus dados não foram apagados.</span>
+        <button
+          onClick={() => void reload()}
+          className="rounded-lg border border-destructive/40 px-3 py-1 font-semibold hover:bg-destructive/10"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
   if (!notice) return null;
   return (
     <div
@@ -149,6 +193,7 @@ const bottomItem =
 function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [moreOpen, setMoreOpen] = useState(false);
+  const { signOut, busy } = useSignOut();
 
   // Fecha o menu "Mais" ao trocar de página.
   useEffect(() => setMoreOpen(false), [pathname]);
@@ -224,6 +269,16 @@ function BottomNav() {
                   {label}
                 </Link>
               ))}
+              <button
+                onClick={() => void signOut()}
+                disabled={busy}
+                className="flex min-h-12 items-center gap-3 rounded-lg px-2 text-sm font-semibold hover:bg-muted disabled:opacity-60"
+              >
+                <span className="grid size-9 place-items-center rounded-lg bg-secondary text-primary">
+                  <LogOut size={18} aria-hidden="true" />
+                </span>
+                {busy ? "Saindo..." : "Sair"}
+              </button>
             </div>
           </div>
         </div>
