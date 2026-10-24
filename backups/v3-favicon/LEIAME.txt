@@ -1,0 +1,4 @@
+Backup ANTES de trocar o favicon.
+Restaurar: cp backups/v3-favicon/public/favicon.ico.bak public/favicon.ico
+           cp backups/v3-favicon/src/routes/__root.tsx.bak src/routes/__root.tsx
+(e apague public/favicon.svg e public/apple-touch-icon.png)
