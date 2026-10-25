@@ -1,0 +1,4 @@
+Backup ANTES da verificacao de e-mail (Etapas B a D).
+Restaurar um arquivo: copie o .bak de volta e tire o sufixo .bak, mantendo o caminho.
+Exemplo: cp backups/v4-email/src/routes/cadastro.tsx.bak src/routes/cadastro.tsx
+Arquivos novos desta etapa (apague para desfazer): src/routes/auth.callback.tsx, src/components/CheckEmailPanel.tsx, src/components/EmailVerification.tsx, docs/email/

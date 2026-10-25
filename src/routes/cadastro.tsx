@@ -1,7 +1,9 @@
-
 import { useState } from "react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "../integrations/supabase/client";
+import { CheckEmailPanel } from "@/components/CheckEmailPanel";
+import { signUpUser } from "@/lib/auth";
+import { currentCallbackUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/cadastro")({
   component: CadastroPage,
@@ -14,13 +16,13 @@ function CadastroPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  // Guarda o e-mail usado depois do cadastro, para mostrar a tela "confirme seu e-mail".
+  const [sentTo, setSentTo] = useState("");
 
   async function handleCadastro(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    setMessage("");
 
     if (password.length < 8) {
       setError("A senha precisa ter pelo menos 8 caracteres.");
@@ -34,30 +36,26 @@ function CadastroPage() {
 
     setLoading(true);
 
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-      });
+    const result = await signUpUser(supabase.auth, {
+      email,
+      password,
+      redirectTo: currentCallbackUrl(),
+    });
+    setLoading(false);
 
-      if (error) {
-        setError("Não foi possível criar a conta. Confira os dados e tente novamente.");
-        return;
-      }
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
 
-      if (data.session) {
-        await navigate({ to: "/" });
-      } else {
-        setMessage(
-          "Cadastro iniciado! Confira seu e-mail para confirmar a conta antes de entrar.",
-        );
-      }
-    } catch {
-      setError("Não foi possível conectar. Verifique sua internet e tente novamente.");
-    } finally {
-      setLoading(false);
+    if (result.needsConfirmation) {
+      setSentTo(email.trim());
+    } else {
+      await navigate({ to: "/" });
     }
   }
+
+  if (sentTo) return <CheckEmailPanel email={sentTo} />;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
@@ -67,9 +65,7 @@ function CadastroPage() {
             S
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Criar conta
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Criar conta</h1>
 
           <p className="mt-2 text-sm text-slate-500">
             Comece a organizar seu estoque com o StockFlow.
@@ -113,7 +109,10 @@ function CadastroPage() {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="confirmPassword"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
               Confirmar senha
             </label>
 
@@ -132,12 +131,6 @@ function CadastroPage() {
           {error && (
             <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
               {error}
-            </p>
-          )}
-
-          {message && (
-            <p role="status" className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800">
-              {message}
             </p>
           )}
 
