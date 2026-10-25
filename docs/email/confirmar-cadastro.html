@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Confirme seu e-mail para acessar o StockFlow</title>
+<style>
+  @media only screen and (max-width: 600px) {
+    .px { padding-left: 20px !important; padding-right: 20px !important; }
+    .title { font-size: 22px !important; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;">
+<!-- Texto de pré-visualização (aparece ao lado do assunto na caixa de entrada) -->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f1f5f9;">Falta só um passo para ativar a sua conta no StockFlow.</div>
+
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f1f5f9" style="background-color:#f1f5f9;">
+  <tr>
+    <td align="center" style="padding:24px 12px;">
+
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:560px;">
+
+        <!-- Marca -->
+        <tr>
+          <td align="center" bgcolor="#0b2250" style="background-color:#0b2250;border-radius:12px 12px 0 0;padding:22px 24px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+              <tr>
+                <td style="padding-right:10px;vertical-align:middle;">
+                  <img src="https://stockflow01-main.vercel.app/apple-touch-icon.png" width="40" height="40" alt="" style="display:block;border:0;border-radius:9px;">
+                </td>
+                <td style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">
+                  Stock<span style="color:#60a5fa;">Flow</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Conteúdo -->
+        <tr>
+          <td class="px" bgcolor="#ffffff" style="background-color:#ffffff;padding:36px 36px 28px 36px;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;font-family:Arial,Helvetica,sans-serif;">
+            <h1 class="title" style="margin:0 0 16px 0;font-size:26px;line-height:1.25;font-weight:700;color:#0f172a;">Bem-vindo ao StockFlow!</h1>
+
+            <p style="margin:0 0 16px 0;font-size:16px;line-height:1.6;color:#334155;">
+              Você criou uma conta com o endereço <strong style="color:#0f172a;">{{ .Email }}</strong>. Falta só um passo: confirmar que este e-mail é seu.
+            </p>
+            <p style="margin:0 0 28px 0;font-size:16px;line-height:1.6;color:#334155;">
+              A confirmação protege a sua conta e garante que os avisos sobre o seu estoque cheguem à pessoa certa.
+            </p>
+
+            <!-- Botão -->
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 28px auto;">
+              <tr>
+                <td align="center" bgcolor="#2563eb" style="background-color:#2563eb;border-radius:8px;">
+                  <a href="{{ .ConfirmationURL }}" target="_blank" style="display:inline-block;padding:15px 32px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;line-height:1;color:#ffffff;text-decoration:none;border-radius:8px;">Confirmar meu e-mail</a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Alternativa -->
+            <p style="margin:0 0 6px 0;font-size:14px;line-height:1.6;color:#475569;">
+              Se o botão não funcionar, copie o endereço abaixo e cole na barra do seu navegador:
+            </p>
+            <p style="margin:0 0 28px 0;font-size:13px;line-height:1.5;word-break:break-all;">
+              <a href="{{ .ConfirmationURL }}" target="_blank" style="color:#2563eb;text-decoration:underline;">{{ .ConfirmationURL }}</a>
+            </p>
+
+            <!-- Aviso de segurança -->
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+              <tr>
+                <td bgcolor="#f8fafc" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#475569;">
+                  <strong style="color:#0f172a;">Não foi você?</strong> Se não criou uma conta no StockFlow, ignore este e-mail. A conta só é ativada depois do clique no botão acima, e este link pode ser usado uma única vez.
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Rodapé -->
+        <tr>
+          <td align="center" bgcolor="#ffffff" style="background-color:#ffffff;border:1px solid #e2e8f0;border-top:1px solid #e2e8f0;border-radius:0 0 12px 12px;padding:18px 24px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#64748b;">
+            StockFlow &middot; Controle de estoque para pequenos negócios<br>
+            Esta é uma mensagem automática. Não é necessário responder.
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+</body>
+</html>

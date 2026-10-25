@@ -135,8 +135,11 @@ function RootComponent() {
   const [sessionChecked, setSessionChecked] = useState(false);
   const [hasSession, setHasSession] = useState(false);
 
+  // /auth/* (retorno do link do e-mail) é pública, mas NÃO redireciona quem já tem sessão:
+  // a pessoa precisa ver o resultado da confirmação.
   const isPublicRoute =
-    pathname === "/login" || pathname === "/cadastro";
+    pathname === "/login" || pathname === "/cadastro" || pathname.startsWith("/auth/");
+  const leavesWhenLoggedIn = pathname === "/login" || pathname === "/cadastro";
 
   useEffect(() => {
     let active = true;
@@ -176,10 +179,10 @@ function RootComponent() {
 
     if (!hasSession && !isPublicRoute) {
       void navigate({ to: "/login", replace: true });
-    } else if (hasSession && isPublicRoute) {
+    } else if (hasSession && leavesWhenLoggedIn) {
       void navigate({ to: "/", replace: true });
     }
-  }, [sessionChecked, hasSession, isPublicRoute, navigate]);
+  }, [sessionChecked, hasSession, isPublicRoute, leavesWhenLoggedIn, navigate]);
 
   return (
     <QueryClientProvider client={queryClient}>
