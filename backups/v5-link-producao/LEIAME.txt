@@ -1,0 +1,3 @@
+Backup ANTES de fazer o link do e-mail apontar sempre para o site publicado e de redirecionar apos a confirmacao.
+Restaurar: copie o .bak de volta e tire o sufixo, mantendo o caminho.
+Arquivo novo desta etapa (apague para desfazer): src/lib/site-url.ts

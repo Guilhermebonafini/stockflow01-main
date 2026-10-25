@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const mock = vi.hoisted(() => ({ getSession: vi.fn(), getUser: vi.fn() }));
+const mock = vi.hoisted(() => ({ getSession: vi.fn(), getUser: vi.fn(), navigate: vi.fn() }));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: { auth: { getSession: mock.getSession, getUser: mock.getUser } },
 }));
 vi.mock("@tanstack/react-router", () => ({
+  useNavigate: () => mock.navigate,
   Link: ({ to, children, className }: { to: string; children: ReactNode; className?: string }) => (
     <a href={to} className={className}>
       {children}
@@ -23,6 +24,7 @@ const open = (hash: string) => window.history.replaceState(null, "", `/auth/call
 beforeEach(() => {
   mock.getSession.mockReset().mockResolvedValue({ data: { session: null } });
   mock.getUser.mockReset();
+  mock.navigate.mockReset();
 });
 afterEach(() => {
   cleanup();
@@ -93,5 +95,39 @@ describe("EmailVerification", () => {
       expect(screen.getByRole("button", { name: "Tentar novamente" })).toBeTruthy(),
     );
     expect(screen.queryByText("E-mail verificado!")).toBeNull();
+  });
+
+  it("depois do sucesso, leva ao início do StockFlow em 5 segundos (e não antes)", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      mock.getUser.mockResolvedValue({
+        data: { user: { email_confirmed_at: "2026-10-24T12:00:00Z" } },
+        error: null,
+      });
+      open(OK_HASH);
+      render(<EmailVerification />);
+      expect(await screen.findByRole("heading", { name: "E-mail verificado!" })).toBeTruthy();
+      expect(screen.getByText(/Entrando no StockFlow em 5 s/)).toBeTruthy();
+
+      for (let i = 0; i < 4; i++) act(() => void vi.advanceTimersByTime(1000));
+      expect(mock.navigate).not.toHaveBeenCalled();
+      for (let i = 0; i < 2; i++) act(() => void vi.advanceTimersByTime(1000));
+      expect(mock.navigate).toHaveBeenCalledWith({ to: "/", replace: true });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("nos erros (expirado, inválido, sem link) nunca redireciona sozinho", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      open("#error=access_denied&error_code=otp_expired");
+      render(<EmailVerification />);
+      expect(await screen.findByRole("heading", { name: "Link expirado" })).toBeTruthy();
+      for (let i = 0; i < 10; i++) act(() => void vi.advanceTimersByTime(1000));
+      expect(mock.navigate).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   authFailure,
+  DEFAULT_SITE_URL,
   callbackUrl,
   classifyAuthError,
   maskEmail,
   parseCallbackUrl,
+  publicSiteUrl,
   resendConfirmation,
   signOutUser,
   signUpUser,
@@ -196,5 +198,43 @@ describe("parseCallbackUrl", () => {
   it("página aberta sem link, ou com outro tipo de link, não conta como confirmação", () => {
     expect(parseCallbackUrl("", "")).toEqual({ kind: "none" });
     expect(parseCallbackUrl("#access_token=a&type=recovery", "")).toEqual({ kind: "none" });
+  });
+});
+
+describe("callbackUrl em ambiente local", () => {
+  it.each([
+    "http://localhost:8080",
+    "http://localhost:3000",
+    "http://127.0.0.1:8080",
+    "http://[::1]:8080",
+    "http://192.168.1.40:8080",
+    "http://10.0.0.5:8080",
+    "http://172.16.3.2:8080",
+    "http://meu-pc.local:8080",
+  ])("%s aponta para o site publicado, nunca para a máquina local", (origin) => {
+    expect(callbackUrl(origin)).toBe(`${DEFAULT_SITE_URL}/auth/callback`);
+  });
+
+  it("site publicado e previews mantêm o próprio endereço", () => {
+    expect(callbackUrl("https://stockflow01-main.vercel.app")).toBe(
+      "https://stockflow01-main.vercel.app/auth/callback",
+    );
+    expect(callbackUrl("https://stockflow01-main-git-x-time.vercel.app")).toBe(
+      "https://stockflow01-main-git-x-time.vercel.app/auth/callback",
+    );
+  });
+
+  it("aceita o site configurado só se for https; ignora lixo", () => {
+    expect(callbackUrl("http://localhost:8080", "https://meu-dominio.com.br/")).toBe(
+      "https://meu-dominio.com.br/auth/callback",
+    );
+    expect(publicSiteUrl("http://inseguro.com")).toBe(DEFAULT_SITE_URL);
+    expect(publicSiteUrl("javascript:alert(1)")).toBe(DEFAULT_SITE_URL);
+    expect(publicSiteUrl("isso não é url")).toBe(DEFAULT_SITE_URL);
+    expect(publicSiteUrl(undefined)).toBe(DEFAULT_SITE_URL);
+  });
+
+  it("origem inválida cai no site publicado", () => {
+    expect(callbackUrl("nao-e-url")).toBe(`${DEFAULT_SITE_URL}/auth/callback`);
   });
 });

@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "../integrations/supabase/client";
 import { CheckEmailPanel } from "@/components/CheckEmailPanel";
-import { callbackUrl, signUpUser } from "@/lib/auth";
+import { signUpUser } from "@/lib/auth";
+import { currentCallbackUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/cadastro")({
   component: CadastroPage,
@@ -38,7 +39,7 @@ function CadastroPage() {
     const result = await signUpUser(supabase.auth, {
       email,
       password,
-      redirectTo: callbackUrl(window.location.origin),
+      redirectTo: currentCallbackUrl(),
     });
     setLoading(false);
 

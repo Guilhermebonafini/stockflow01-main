@@ -25,9 +25,16 @@ os limites e preços atuais antes de decidir. Nada disso foi contratado.
 - **Site URL:** `https://stockflow01-main.vercel.app` (já está assim).
 - **Redirect URLs** (hoje está vazio). Clique em **Add URL** e adicione:
   - `https://stockflow01-main.vercel.app/auth/callback`
-  - `http://localhost:8080/auth/callback` (para testar no seu computador)
   - Para os previews da Vercel, um curinga com o nome da sua conta ou equipe, que aparece no
     endereço dos previews: `https://*-SEU-NOME-NA-VERCEL.vercel.app/auth/callback`
+
+**Cadastro feito no seu computador (localhost):** o link do e-mail aponta para o site publicado
+(`https://stockflow01-main.vercel.app/auth/callback`), e não para o `localhost`. Assim o link abre no
+celular e em qualquer computador. Por isso **não é preciso** liberar `localhost` na lista. Quem
+quiser outro endereço pode definir a variável pública `VITE_SITE_URL` (precisa começar com `https://`).
+
+E-mails enviados antes da correção do Site URL podem ainda apontar para `http://localhost:3000`.
+Esses links não têm conserto: peça um novo e-mail (botão de reenvio) ou cadastre de novo.
 
 Se o endereço de retorno não estiver na lista, o Supabase ignora o pedido e manda a pessoa para o
 Site URL (a página inicial). Ela entra, mas não vê a tela "E-mail verificado!".
@@ -50,7 +57,7 @@ Site URL (a página inicial). Ela entra, mas não vê a tela "E-mail verificado!
 | 3 | Esperar e clicar em reenviar | Indicador de carregamento, depois "Pedido de reenvio feito...". |
 | 4 | Clicar em reenviar de novo logo em seguida | Botão desativado de novo, sem novo pedido. |
 | 5 | Abrir o e-mail (computador e celular) | Marca StockFlow, botão azul "Confirmar meu e-mail", link alternativo e aviso de segurança. |
-| 6 | Clicar em "Confirmar meu e-mail" | Tela "E-mail verificado!" e o botão "Acessar minha conta". |
+| 6 | Clicar em "Confirmar meu e-mail" | Abre o site publicado (não o localhost). Tela "E-mail verificado!" e, depois de 5 segundos, o início do StockFlow já logado. O botão "Acessar minha conta" vai na hora. |
 | 7 | Clicar no mesmo link uma segunda vez | "Link expirado" (o link vale uma vez só). |
 | 8 | Abrir `/auth/callback` direto, sem link | "Nada para confirmar aqui". Nunca "E-mail verificado!". |
 | 9 | Desligar a internet e clicar no botão do e-mail | "Sem conexão", com "Tentar novamente". |

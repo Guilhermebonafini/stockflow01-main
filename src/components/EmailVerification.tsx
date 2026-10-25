@@ -1,9 +1,12 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { classifyAuthError, parseCallbackUrl, type CallbackInfo } from "@/lib/auth";
 
 type Phase = "checking" | "success" | "expired" | "invalid" | "network" | "none";
+
+// Depois da confirmação, a pessoa já está logada: levamos para o início do StockFlow.
+const REDIRECT_SECONDS = 5;
 
 const linkPrimary =
   "mt-6 block w-full rounded-lg bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-blue-700";
@@ -59,7 +62,9 @@ const IconSpin = (
 // Mostra o resultado da confirmação de e-mail. "E-mail verificado!" só aparece depois
 // que o SERVIDOR confirma (getUser com email_confirmed_at). Abrir a rota não basta.
 export function EmailVerification() {
+  const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("checking");
+  const [secondsLeft, setSecondsLeft] = useState(REDIRECT_SECONDS);
 
   // A URL é lida na primeira renderização, antes de o cliente do Supabase processar
   // e limpar o "#" do endereço.
@@ -94,6 +99,16 @@ export function EmailVerification() {
     };
   }, [info]);
 
+  useEffect(() => {
+    if (phase !== "success") return;
+    if (secondsLeft <= 0) {
+      void navigate({ to: "/", replace: true });
+      return;
+    }
+    const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [phase, secondsLeft, navigate]);
+
   if (phase === "checking") {
     return (
       <Card icon={IconSpin} title="Confirmando seu e-mail...">
@@ -113,7 +128,13 @@ export function EmailVerification() {
         <p className="mt-2 text-sm text-slate-500">
           Bem-vindo! Cadastre seus produtos e comece a acompanhar o seu estoque.
         </p>
-        <Link to="/" className={linkPrimary}>
+        <p role="status" className="mt-4 text-xs text-slate-500">
+          Entrando no StockFlow em {secondsLeft} s...
+        </p>
+        <Link
+          to="/"
+          className="mt-3 block w-full rounded-lg bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-blue-700"
+        >
           Acessar minha conta
         </Link>
       </Card>

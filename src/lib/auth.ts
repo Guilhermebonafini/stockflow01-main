@@ -159,10 +159,43 @@ export function maskEmail(email: string): string {
   return `${visible}***@${domain}`;
 }
 
-// Endereço para onde o link do e-mail volta. Usa sempre o site de onde o pedido saiu,
-// com caminho fixo: nenhum valor vindo da URL ou do usuário entra aqui.
-export function callbackUrl(origin: string): string {
-  return `${origin}/auth/callback`;
+// Site publicado do StockFlow. É o destino dos links de e-mail quando o cadastro é feito
+// de um endereço local (localhost). Pode ser trocado pela variável pública VITE_SITE_URL.
+export const DEFAULT_SITE_URL = "https://stockflow01-main.vercel.app";
+
+function isLocalHost(hostname: string): boolean {
+  return (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "[::1]" ||
+    hostname.endsWith(".local") ||
+    /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(hostname)
+  );
+}
+
+// Só aceita endereço https válido. Qualquer outra coisa volta para o site padrão.
+export function publicSiteUrl(configured?: string): string {
+  try {
+    const url = new URL(configured ?? "");
+    if (url.protocol === "https:") return url.origin;
+  } catch {
+    // valor ausente ou inválido: usa o padrão
+  }
+  return DEFAULT_SITE_URL;
+}
+
+// Endereço para onde o link do e-mail volta. Caminho fixo (/auth/callback) e origem sempre
+// do próprio site ou do site publicado: nenhum valor vindo da URL ou do usuário entra aqui.
+// Cadastros feitos em localhost ou na rede local apontam para o site publicado, porque um
+// link com "localhost" só abriria no computador de quem está desenvolvendo.
+export function callbackUrl(origin: string, configuredSite?: string): string {
+  let base: string;
+  try {
+    base = isLocalHost(new URL(origin).hostname) ? publicSiteUrl(configuredSite) : origin;
+  } catch {
+    base = publicSiteUrl(configuredSite);
+  }
+  return `${base}/auth/callback`;
 }
 
 export type CallbackInfo =

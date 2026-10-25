@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { callbackUrl, maskEmail, resendConfirmation } from "@/lib/auth";
+import { maskEmail, resendConfirmation } from "@/lib/auth";
+import { currentCallbackUrl } from "@/lib/site-url";
 
 // O Supabase aceita um novo e-mail por usuário a cada 60 segundos.
 const COOLDOWN_SECONDS = 60;
@@ -27,7 +28,7 @@ export function CheckEmailPanel({ email }: { email: string }) {
     setFeedback(null);
     const result = await resendConfirmation(supabase.auth, {
       email,
-      redirectTo: callbackUrl(window.location.origin),
+      redirectTo: currentCallbackUrl(),
     });
     setSending(false);
 
